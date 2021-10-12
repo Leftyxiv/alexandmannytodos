@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { Route } from 'react-router';
 import './App.css';
 
 import { v4 as uuidv4 } from 'uuid';
 
 import Input from './components/Input';
 import TodoList from './components/TodoList';
+import EditTodo from './components/EditTodo';
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -36,7 +38,6 @@ function App() {
     setTodos([...todos, newTodo]);
   };
 
-  // create a functopn that will toggle the completed status of the todo
   const toggleTodo = (id) => {
    for (let i = 0; i < todos.length; ++i) {
      if (todos[i].id === id) {
@@ -45,18 +46,32 @@ function App() {
    }
   }
   // create a function that will delete the todo
+  const deleteTodo = (id) => {
+    const filteredTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(filteredTodos);
+  };
 
-  // create a function that wil delete al to doso
   const deleteAll = () => {
     const filteredTodos = todos.filter((todo) => !todo.completed);
     setTodos(filteredTodos);
   };
 
+  const editTodo = (id, input) => {
+    for (let i = 0; i < todos.length; ++i) {
+      if (todos[i].id === id) {
+        todos[i].text = input;
+        return;
+      }
+    }
+  };
   return (
     <div className="App">
+      <Route exact path='/'>
       <Input addTodo={addTodo} />
-      <TodoList toggleTodo={toggleTodo} todos={todos} />
+      <TodoList deleteTodo={deleteTodo} toggleTodo={toggleTodo} todos={todos} />
       <button onClick={deleteAll}>Delete all completed todos</button>
+      </Route>
+      <Route path='/:id' render={(props) => <EditTodo editTodo={editTodo} todos={todos} {...props} />} />
     </div>
   );
 }
